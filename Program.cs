@@ -9,7 +9,6 @@ namespace CS2_ESP
 {
     class Program
     {
-        // Windows API: Oyun penceresinin boyutlarını dinamik olarak almak için
         [DllImport("user32.dll")]
         private static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
 
@@ -44,18 +43,21 @@ namespace CS2_ESP
             Swed swed;
             try
             {
+                // Bellek yöneticisini hata denetimiyle başlatıyoruz
                 swed = new Swed("cs2");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"CS2 sureci bulunamadi: {ex.Message}");
+                Console.WriteLine($"[HATA] CS2 surecine baglanilamadi. Oyunun acik oldugundan emin olun: {ex.Message}");
+                Console.ReadLine();
                 return;
             }
 
             IntPtr client = swed.GetModuleBase("client.dll");
             if (client == IntPtr.Zero)
             {
-                Console.WriteLine("client.dll bulunamadi.");
+                Console.WriteLine("[HATA] client.dll modulu bellekte bulunamadi.");
+                Console.ReadLine();
                 return;
             }
 
@@ -64,13 +66,13 @@ namespace CS2_ESP
             renderThread.Start();
 
             List<Entity> tempEntities = new List<Entity>();
-            Console.WriteLine("CS2 ESP Modulu Stabilize Edildi ve Baslatildi.");
+            Console.WriteLine("ESP Modulu Yuklendi. Moduller dogrulandi.");
 
             while (true)
             {
                 try
                 {
-                    // 1. Ekran Çözünürlüğünü Dinamik Olarak Güncelleme
+                    // Çözünürlük güncellemesi
                     IntPtr hwnd = FindWindow("SDL_app", "Counter-Strike 2");
                     if (hwnd != IntPtr.Zero && GetClientRect(hwnd, out RECT rect))
                     {
@@ -121,7 +123,6 @@ namespace CS2_ESP
                         Vector3 viewOffset = swed.ReadVec(pawn + Offsets.m_vecViewOffset);
                         Vector3 headPosition3D = position3D + viewOffset;
 
-                        // 2. Kemik Verilerini Okurken Null Pointer Kontrolü
                         IntPtr sceneNode = swed.ReadPointer(pawn + Offsets.m_pGameSceneNode);
                         List<Vector3> bones3D = new List<Vector3>();
                         if (sceneNode != IntPtr.Zero)
@@ -157,8 +158,8 @@ namespace CS2_ESP
                 }
                 catch (Exception ex)
                 {
-                    // Herhangi bir hafıza okuma hatası veya harita yüklenme anındaki kararsızlıkta çökmeyi engeller
-                    Console.WriteLine($"Dongu sirasinda hata yakalandi, atlanıyor: {ex.Message}");
+                    // Döngü içi kararsızlıklarda uygulamanın çökmesini engeller
+                    Console.WriteLine($"[UYARI] Bellek okuma hatası atlandı: {ex.Message}");
                 }
 
                 Thread.Sleep(5);
