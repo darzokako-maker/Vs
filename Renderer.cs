@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Numerics;
-using System.Threading.Tasks; // Task sınıfı için eklenmiştir
+using System.Threading.Tasks;
 using ImGuiNET;
 using ClickableTransparentOverlay;
 
@@ -21,7 +21,6 @@ namespace CS2_ESP
         public Vector4 boxColor = new Vector4(1f, 0f, 0f, 1f);
         public Vector4 boneColor = new Vector4(0f, 1f, 0f, 1f);
 
-        // Hata veren kısım 'Task' dönüş tipiyle ve 'return Task.CompletedTask' ile güncellenmiştir
         protected override Task Render()
         {
             if (ImGui.IsKeyPressed(ImGuiKey.Insert))
@@ -73,48 +72,50 @@ namespace CS2_ESP
 
                         try
                         {
-                            // Omurga bağlantıları
+                            // Omurga
                             DrawBoneLine(drawList, entity.Bones2D, 0, 1, bColorUint); 
                             DrawBoneLine(drawList, entity.Bones2D, 1, 2, bColorUint); 
                             DrawBoneLine(drawList, entity.Bones2D, 2, 3, bColorUint); 
 
-                            // Sol Kol bağlantıları
+                            // Sol Kol
                             DrawBoneLine(drawList, entity.Bones2D, 1, 4, bColorUint);
                             DrawBoneLine(drawList, entity.Bones2D, 4, 5, bColorUint);
                             DrawBoneLine(drawList, entity.Bones2D, 5, 6, bColorUint);
 
-                            // Sağ Kol bağlantıları
+                            // Sağ Kol
                             DrawBoneLine(drawList, entity.Bones2D, 1, 7, bColorUint);
                             DrawBoneLine(drawList, entity.Bones2D, 7, 8, bColorUint);
                             DrawBoneLine(drawList, entity.Bones2D, 8, 9, bColorUint);
 
-                            // Sol Bacak bağlantıları
+                            // Sol Bacak
                             DrawBoneLine(drawList, entity.Bones2D, 3, 10, bColorUint);
                             DrawBoneLine(drawList, entity.Bones2D, 10, 11, bColorUint);
                             DrawBoneLine(drawList, entity.Bones2D, 11, 12, bColorUint);
 
-                            // Sağ Bacak bağlantıları
+                            // Sağ Bacak
                             DrawBoneLine(drawList, entity.Bones2D, 3, 13, bColorUint);
                             DrawBoneLine(drawList, entity.Bones2D, 13, 14, bColorUint);
                             DrawBoneLine(drawList, entity.Bones2D, 14, 15, bColorUint);
                         }
                         catch
                         {
-                            // Olası liste taşmalarını önlemek için
+                            // Sınır taşma hatalarını yutmak için
                         }
                     }
                 }
             }
 
-            // Task tamamlandığı için CompletedTask dönüyoruz
             return Task.CompletedTask;
         }
 
         private void DrawBoneLine(ImDrawListPtr drawList, List<Vector2> bones2D, int fromIndex, int toIndex, uint color)
         {
-            if (bones2D[fromIndex].X != -99 && bones2D[toIndex].X != -99)
+            if (bones2D != null && fromIndex < bones2D.Count && toIndex < bones2D.Count)
             {
-                drawList.AddLine(bones2D[fromIndex], bones2D[toIndex], color, 1.5f);
+                if (bones2D[fromIndex].X != -99 && bones2D[toIndex].X != -99)
+                {
+                    drawList.AddLine(bones2D[fromIndex], bones2D[toIndex], color, 1.5f);
+                }
             }
         }
     }
